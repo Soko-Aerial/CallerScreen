@@ -1,5 +1,6 @@
 package com.example.callerscreen
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CallerScreenTheme {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 Navigation()
             }
         }

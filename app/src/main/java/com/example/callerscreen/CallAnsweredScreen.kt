@@ -39,7 +39,7 @@ fun AnswerScreen(navController: NavHostController) {
             color = Color(0xFF9A9A00),
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 50.dp)
+                .padding(top = 40.dp)
         )
 
         // Corner lines
@@ -125,7 +125,9 @@ fun CameraButton(modifier: Modifier = Modifier) {
     CircularButton(
         icon = R.drawable.camera,
         backgroundColor = Color.LightGray,
-        onClick = { /* Sync action */ })
+        onClick = {
+
+        })
 }
 
 @Composable
