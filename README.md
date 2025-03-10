@@ -1,5 +1,4 @@
 The Caller Screen
-This project is a stand alone caller Screen project
 
 ****Description****
 This is project displays a caller screen when there is an incoming call and give you the ability to Answer or Decline the call
