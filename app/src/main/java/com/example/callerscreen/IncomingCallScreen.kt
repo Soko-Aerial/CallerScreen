@@ -44,7 +44,7 @@ fun CallScreen(navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     var showResponses by remember { mutableStateOf(false) }
     val predefinedMessages = listOf(
-        "Can't talk now, call you later.gg",
+        "Can't talk now, call you later.",
         "I'm busy, text me.",
         "I'll call you back soon.",
         "In a meeting, talk later."
