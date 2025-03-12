@@ -1,10 +1,7 @@
 package com.example.callerscreen
 
 import android.Manifest
-import android.content.Context
 import android.util.Log
-import android.view.ViewGroup
-import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.background
@@ -16,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.google.common.util.concurrent.ListenableFuture
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,16 +21,11 @@ import androidx.camera.core.Preview
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 @Composable
 fun AnswerScreen(navController: NavController) {
@@ -125,14 +114,14 @@ fun CameraToggleButton(cameraSelectorState: MutableState<CameraSelector>) {
 
 
 @Composable
-fun EndCall(modifier: Modifier = Modifier,
+fun EndCall(
             navController: NavController
-) {
-    CircularButton(
-        icon = R.drawable.call2,
-        backgroundColor = Color.LightGray,
-        onClick = { navController.navigate("declineScreen") })
-}
+    ) {
+        CircularButton(
+            icon = R.drawable.call2,
+            backgroundColor = Color.LightGray,
+            onClick = { navController.navigate("declineScreen") })
+    }
 
 
 @Composable
