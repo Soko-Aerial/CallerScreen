@@ -46,7 +46,7 @@ fun CallScreen(navController: NavHostController) {
     val predefinedMessages = listOf(
         "Can't talk now, call you later.",
         "I'm busy, text me.",
-        "I'll call you back soon.",
+        "I'll call you back soon.gg",
         "In a meeting, talk later."
     )
     Box(
