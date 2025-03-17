@@ -167,15 +167,3 @@ fun EndCall(navController: NavController) {
     }
 }
 
-@Composable
-fun RequestPermissions() {
-    val context = LocalContext.current
-    val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
-            if (!granted.values.all { it }) {
-                Toast.makeText(context, "Permissions required!", Toast.LENGTH_SHORT).show()
-            }
-        }
-    LaunchedEffect(Unit) { launcher.launch(permissions) }
-}

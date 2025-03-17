@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
-// ❌ Declined Call Screen
+//  Declined Call Screen
 @Composable
 fun DeclineScreen(navController: NavHostController) {
     ScreenLayout(
@@ -27,7 +27,7 @@ fun DeclineScreen(navController: NavHostController) {
     )
 }
 
-// 🔹 Generic UI Layout for Screens
+
 @Composable
 fun ScreenLayout(
     title: String,
