@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CallerScreenTheme {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                com.example.sigtrack_calll.Navigation()
+                com.example.sigtrack_call.Navigation()
             }
         }
     }
@@ -26,6 +26,6 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 private fun CallerScreen() {
-    com.example.sigtrack_calll.Navigation()
+    com.example.sigtrack_call.Navigation()
 }
 
