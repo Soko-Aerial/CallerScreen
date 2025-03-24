@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
+    id("maven-publish")
 }
 
 android {
@@ -35,6 +36,17 @@ android {
 
     buildFeatures {
         compose = true
+    }
+}
+
+//publishing
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
     }
 }
 
