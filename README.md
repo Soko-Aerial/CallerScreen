@@ -24,7 +24,8 @@ Add it in your root settings.gradle at the end of repositories:
 	}
 
 
-Add the dependency
+Add the dependency:
+
 	dependencies {
 	        implementation 'com.github.Soko-Aerial:CallerScreen:Tag'
 	}
