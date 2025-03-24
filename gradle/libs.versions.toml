@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.3"
+callerscreen = "1.0.1"
 cameraCoreVersion = "1.4.1"
 cameraLifecycleVersion = "1.4.1"
 cameraViewVersion = "1.4.1"
@@ -30,6 +31,7 @@ androidx-camera-lifecycle-v131 = { module = "androidx.camera:camera-lifecycle", 
 #noinspection SimilarGradleDependency
 androidx-camera-view-v131 = { module = "androidx.camera:camera-view", version.ref = "cameraViewVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+callerscreen = { module = "com.github.Soko-Aerial:CallerScreen", version.ref = "callerscreen" }
 dotlottie-android = { module = "com.github.LottieFiles:dotlottie-android", version.ref = "dotlottieAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

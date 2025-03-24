@@ -17,9 +17,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url= uri("https://jitpack.io") }
     }
 }
 
+
 rootProject.name = "Caller Screen"
 include(":app")
-include(":sigtrack-call")
+//include(":sigtrack-call")
