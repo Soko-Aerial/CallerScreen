@@ -19,7 +19,7 @@ Add it in your root settings.gradle at the end of repositories:
 		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
 		repositories {
 			mavenCentral()
-			maven { url 'https://jitpack.io' }
+			maven { url= uri("https://jitpack.io") }
 		}
 	}
 
@@ -27,5 +27,5 @@ Add it in your root settings.gradle at the end of repositories:
 Add the dependency:
 
 	dependencies {
-	        implementation 'com.github.Soko-Aerial:CallerScreen:Tag'
+	        implementation ("com.github.Soko-Aerial:CallerScreen:1.0.1")
 	}
