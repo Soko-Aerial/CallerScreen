@@ -63,7 +63,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 //    implementation(project(":sigtrack-call"))
 
-    implementation (libs.callerscreen)
+//    implementation(libs.google.webrtc)
 
 }
 

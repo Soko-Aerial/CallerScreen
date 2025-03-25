@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Caller Screen"
 include(":app")
-//include(":sigtrack-call")
+include(":sigtrack-call")

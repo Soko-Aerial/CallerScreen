@@ -1,4 +1,4 @@
-package com.example.sigtrack_calll
+package com.example.sigtrack_call
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import com.airbnb.lottie.compose.*
+import com.example.sigtrack_calll.R
 
 
 @Composable
