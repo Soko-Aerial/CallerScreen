@@ -50,6 +50,7 @@ publishing {
     }
 }
 
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -73,6 +74,6 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
 
 
-    // web rtc
-    implementation(libs.google.webrtc)
+    // webrtc
+    implementation (libs.android)
 }

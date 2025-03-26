@@ -9,10 +9,11 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
+    lateinit var webRTCManager: WebRTCManager
 
     NavHost(navController = navController, startDestination = "callScreen") {
         composable("callScreen") { CallScreen(navController) }
         composable("declineScreen") { DeclineScreen(navController) }
-        composable("answeredScreen") { AnswerScreen(navController) }
+        composable("answeredScreen") { CallAnsweredScreen(navController,webRTCManager = webRTCManager) }
     }
 }
