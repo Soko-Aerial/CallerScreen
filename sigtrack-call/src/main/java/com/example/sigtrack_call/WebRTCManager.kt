@@ -4,113 +4,129 @@ import android.content.Context
 import android.util.Log
 import org.webrtc.*
 
-class WebRTCManager(context: Context) {
-
+class WebRTCManager(private val context: Context, var signalingClient: SignalingClient) {
     private val eglBase = EglBase.create()
-    val localView: SurfaceViewRenderer = SurfaceViewRenderer(context)
-    val remoteView: SurfaceViewRenderer = SurfaceViewRenderer(context)
-
-    private val peerConnectionFactory: PeerConnectionFactory
+    private var peerConnectionFactory: PeerConnectionFactory
     private var peerConnection: PeerConnection? = null
-    private var localAudioTrack: AudioTrack? = null
     private var localVideoTrack: VideoTrack? = null
-    private var videoCapturer: CameraVideoCapturer? = null
-
+    private var localAudioTrack: AudioTrack? = null
+    private var localStream: MediaStream? = null
+    private var remoteVideoTrack: VideoTrack? = null
     private val iceServers = listOf(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer()
     )
 
     init {
-        // Initialize WebRTC
-        val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(context)
-            .setEnableInternalTracer(true)
-            .createInitializationOptions()
-        PeerConnectionFactory.initialize(initializationOptions)
+        PeerConnectionFactory.initialize(
+            PeerConnectionFactory.InitializationOptions.builder(context)
+                .setEnableInternalTracer(true)
+                .createInitializationOptions()
+        )
 
-        // Create PeerConnectionFactory
         peerConnectionFactory = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(DefaultVideoEncoderFactory(eglBase.eglBaseContext, true, true))
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
             .createPeerConnectionFactory()
-
-        setupSurfaceViews()
-        setupPeerConnection()
-        setupLocalTracks()  // ✅ Fix: Now calling this function!
     }
 
-    private fun setupSurfaceViews() {
-        localView.init(eglBase.eglBaseContext, null)
-        remoteView.init(eglBase.eglBaseContext, null)
-    }
+    fun setupLocalTracks(videoCapturer: VideoCapturer) {
+        val videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast)
+        videoCapturer.startCapture(1280, 720, 30)
+        localVideoTrack = peerConnectionFactory.createVideoTrack("LOCAL_VIDEO", videoSource)
 
-    fun setupLocalTracks() {
-        // Create video capturer
-        videoCapturer = getCameraCapturer()
-        val videoSource = peerConnectionFactory.createVideoSource(videoCapturer!!.isScreencast)
-        localVideoTrack = peerConnectionFactory.createVideoTrack("local_video", videoSource)
-
-        // Create audio track
         val audioSource = peerConnectionFactory.createAudioSource(MediaConstraints())
-        localAudioTrack = peerConnectionFactory.createAudioTrack("local_audio", audioSource)
+        localAudioTrack = peerConnectionFactory.createAudioTrack("LOCAL_AUDIO", audioSource)
 
-        // Attach local video stream to the renderer
-        localVideoTrack?.addSink(localView)
-
-        // Start capturing video
-        videoCapturer?.startCapture(1280, 720, 30)
-    }
-
-    private fun getCameraCapturer(): CameraVideoCapturer? {
-        val cameraEnumerator = Camera2Enumerator(localView.context)
-        for (deviceName in cameraEnumerator.deviceNames) {
-            if (cameraEnumerator.isFrontFacing(deviceName)) {
-                return cameraEnumerator.createCapturer(deviceName, null)
-            }
+        localStream = peerConnectionFactory.createLocalMediaStream("LOCAL_STREAM").apply {
+            addTrack(localVideoTrack)
+            addTrack(localAudioTrack)
         }
-        return null
     }
 
-    private fun setupPeerConnection() {
+    fun createPeerConnection(): PeerConnection? {
         val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
-        rtcConfig.bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
-
         peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
-            override fun onIceCandidate(candidate: IceCandidate?) {
-                candidate?.let {
-                    // Send ICE candidate to remote peer
-                    Log.d("WebRTC", "New ICE Candidate: ${it.sdp}")
-                    // TODO: Send this candidate over signaling server
+            override fun onIceCandidate(candidate: IceCandidate) {
+                signalingClient.sendIceCandidate(candidate)
+            }
+
+            override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>) {
+                // Handle ICE candidates removed (optional)
+            }
+
+            override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
+                // Handle signaling state changes
+            }
+
+            override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
+                // Handle ICE connection state changes
+            }
+
+            override fun onIceConnectionReceivingChange(receiving: Boolean) {
+                // Handle changes in receiving ICE connection (deprecated in newer versions)
+            }
+
+            override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
+                // Handle ICE gathering state changes
+            }
+
+            override fun onAddStream(mediaStream: MediaStream) {
+                // Handle incoming media stream (Deprecated: Use onTrack)
+            }
+
+            override fun onRemoveStream(mediaStream: MediaStream) {
+                // Handle stream removal (Deprecated: Use onTrack)
+            }
+
+            override fun onDataChannel(dataChannel: DataChannel) {
+                // Handle data channel events
+            }
+
+            override fun onRenegotiationNeeded() {
+                // Handle renegotiation if needed
+            }
+
+            override fun onTrack(transceiver: RtpTransceiver) {
+                // Handle new media tracks (Video/Audio)
+            }
+        })
+
+        peerConnection?.addStream(localStream)
+        return peerConnection
+    }
+
+    fun createOffer() {
+        peerConnection?.createOffer(object : SdpObserverImpl() {
+            override fun onCreateSuccess(sdp: SessionDescription?) {
+                sdp?.let {
+                    peerConnection?.setLocalDescription(SdpObserverImpl(), it)
+                    signalingClient.sendOffer(it)
                 }
             }
+        }, MediaConstraints())
+    }
 
-            override fun onAddStream(stream: MediaStream?) {
-                stream?.videoTracks?.firstOrNull()?.addSink(remoteView)
+    fun acceptCall(remoteSdp: String) {
+        val sessionDescription = SessionDescription(SessionDescription.Type.OFFER, remoteSdp)
+        peerConnection?.setRemoteDescription(SdpObserverImpl(), sessionDescription)
+        peerConnection?.createAnswer(object : SdpObserverImpl() {
+            override fun onCreateSuccess(sdp: SessionDescription?) {
+                sdp?.let {
+                    peerConnection?.setLocalDescription(SdpObserverImpl(), it)
+                    signalingClient.sendAnswer(it)
+                }
             }
-
-            override fun onSignalingChange(signalingState: PeerConnection.SignalingState?) {}
-            override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState?) {}
-            override fun onIceConnectionReceivingChange(p0: Boolean) {}
-            override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState?) {}
-            override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>?) {}
-            override fun onAddTrack(receiver: RtpReceiver?, mediaStreams: Array<out MediaStream>?) {}
-            override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {}
-            override fun onTrack(transceiver: RtpTransceiver?) {}
-            override fun onRemoveStream(p0: MediaStream?) {}
-            override fun onRenegotiationNeeded() {}
-            override fun onDataChannel(p0: DataChannel?) {}
-        })
+        }, MediaConstraints())
     }
 
-    fun toggleCamera() {
-        videoCapturer?.switchCamera(null)
+    fun onRemoteAnswer(remoteSdp: String) {
+        val sessionDescription = SessionDescription(SessionDescription.Type.ANSWER, remoteSdp)
+        peerConnection?.setRemoteDescription(SdpObserverImpl(), sessionDescription)
     }
 
-    fun toggleMute() {
-        localAudioTrack?.setEnabled(!(localAudioTrack?.enabled() ?: true))
+    fun addIceCandidate(candidate: IceCandidate) {
+        peerConnection?.addIceCandidate(candidate)
     }
 
-    fun closeConnection() {
-        peerConnection?.close()
-        videoCapturer?.stopCapture()
-    }
+
 }

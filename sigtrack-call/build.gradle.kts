@@ -56,6 +56,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,4 +78,5 @@ dependencies {
 
     // webrtc
     implementation (libs.android)
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 }

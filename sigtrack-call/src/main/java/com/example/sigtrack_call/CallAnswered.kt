@@ -1,16 +1,22 @@
 package com.example.sigtrack_call
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -21,33 +27,39 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import com.example.sigtrack_calll.R
 import org.webrtc.SurfaceViewRenderer
 
-// CallAnsweredScreen.kt
 @Composable
 fun CallAnsweredScreen(navController: NavController, webRTCManager: WebRTCManager) {
     val isLocalVideoSmall = remember { mutableStateOf(true) }
     val pipOffset = remember { mutableStateOf(Offset(50f, 100f)) }
+    RequestPermissions()
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFFEFEFEF))) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Large Video Preview (Toggles between Local & Remote)
         if (isLocalVideoSmall.value) {
-            RemoteVideoPreview(webRTCManager.remoteView,
-                Modifier.fillMaxSize())
+            RemoteVideoPreview(webRTCManager.remoteView, Modifier.fillMaxSize())
         } else {
             LocalVideoPreview(webRTCManager.localView, Modifier.fillMaxSize())
         }
 
+        // Draggable PiP (Picture-in-Picture) Local Preview
         Box(
             modifier = Modifier
                 .offset { IntOffset(pipOffset.value.x.toInt(), pipOffset.value.y.toInt()) }
-                .size(150.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .size(140.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .border(2.dp, Color.White, RoundedCornerShape(12.dp))
                 .background(Color.Black)
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
@@ -68,13 +80,25 @@ fun CallAnsweredScreen(navController: NavController, webRTCManager: WebRTCManage
             }
         }
 
+        // Buttons UI
         Column(
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            CameraToggleButton { webRTCManager.toggleCamera() }
-            MuteButton { webRTCManager.toggleMute() }
-            EndCall(navController)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(12.dp)
+            ) {
+                CameraToggleButton { webRTCManager.toggleCamera() }
+                MuteButton { webRTCManager.toggleMute() }
+                EndCall(navController)
+            }
         }
     }
 }
@@ -84,7 +108,7 @@ fun LocalVideoPreview(surfaceViewRenderer: SurfaceViewRenderer, modifier: Modifi
     AndroidView(
         factory = { context ->
             surfaceViewRenderer.apply {
-                setMirror(true) // Mirror for local video
+                setMirror(true)
                 setZOrderMediaOverlay(true)
             }
         },
@@ -97,10 +121,68 @@ fun RemoteVideoPreview(surfaceViewRenderer: SurfaceViewRenderer, modifier: Modif
     AndroidView(
         factory = { context ->
             surfaceViewRenderer.apply {
-                setMirror(false) // No mirror for remote video
+                setMirror(false)
                 setZOrderMediaOverlay(false)
             }
         },
         modifier = modifier
     )
+}
+
+@Composable
+fun CameraToggleButton(onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .size(60.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.camera),
+            contentDescription = "Toggle Camera",
+            tint = Color.White,
+            modifier = Modifier.size(32.dp)
+        )
+    }
+}
+
+@Composable
+fun MuteButton(onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .size(60.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.secondary)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "Mute",
+            tint = Color.White,
+            modifier = Modifier.size(32.dp)
+        )
+    }
+}
+
+@Composable
+fun EndCall(navController: NavController) {
+    IconButton(
+        onClick = {
+            navController.navigate("declineScreen") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+        },
+        modifier = Modifier
+            .size(60.dp)
+            .clip(CircleShape)
+            .background(Color.Red)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.call2),
+            contentDescription = "End Call",
+            tint = Color.White,
+            modifier = Modifier.size(32.dp)
+        )
+    }
 }

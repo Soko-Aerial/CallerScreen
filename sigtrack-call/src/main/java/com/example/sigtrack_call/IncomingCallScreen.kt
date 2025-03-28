@@ -40,7 +40,11 @@ import com.example.sigtrack_calll.R
 
 
 @Composable
-fun CallScreen(navController: NavHostController) {
+fun IncomingCallScreen(
+    navController: NavController,
+    signalingClient: SignalingClient,
+    webRTCManager: WebRTCManager
+) {
     RingtoneHandler()
     val coroutineScope = rememberCoroutineScope()
     var showResponses by remember { mutableStateOf(false) }
@@ -75,14 +79,13 @@ fun CallScreen(navController: NavHostController) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             // Decline Button (Left)
-            DeclineButton(navController)
+            DeclineButton(navController, signalingClient)
 
             // Central Message Button with Glowing Effect
             LottieMessageButton(onClick = { showResponses = true })
 
             // Accept Button (Right)
-            AcceptButton(navController)
-
+            AcceptButton(navController, webRTCManager)
         }
 
         if (showResponses) {
@@ -155,61 +158,51 @@ fun PredefinedMessageDialog(
 
 
 @Composable
-private fun DeclineButton(navController: NavController) {
+private fun DeclineButton(navController: NavController, signalingClient: SignalingClient) {
     PhoneCallButton(
         text = "Decline",
         color = Color.Red,
         icon = painterResource(R.drawable.call2),
-        navController = navController
+        onClick = {
+            signalingClient.sendCallDeclineMessage()
+            navController.navigate("declineScreen")
+        }
     )
 }
 
-
 @Composable
-private fun AcceptButton(navController: NavController) {
+private fun AcceptButton(navController: NavController, webRTCManager: WebRTCManager) {
     PhoneCallButton(
         text = "Accept",
         color = Color.Green,
         icon = painterResource(R.drawable.call1),
-        navController = navController
+        onClick = {
+            webRTCManager.startCall()
+            navController.navigate("answeredScreen")
+        }
     )
 }
 
 @Composable
 private fun PhoneCallButton(
-    modifier: Modifier = Modifier,
     text: String,
     color: Color,
     icon: Painter,
-    navController: NavController
+    onClick: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.Center,
-        modifier = modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = rememberRipple(bounded = false, color = color),
-            enabled = true,
-            onClick = {
-                if (text == "Accept"){
-                    navController.navigate("answeredScreen")
-                }
-                else if(text == "Decline"){
-                    navController.navigate("declineScreen")
-                }
-            }
-        )) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.clickable(onClick = onClick)
+    ) {
         Image(
             painter = icon,
             contentDescription = text,
-            modifier = Modifier
-                .size(60.dp)
-                .padding(8.dp)
-
+            modifier = Modifier.size(60.dp).padding(8.dp)
         )
         Text(
             text = text,
             color = Color.Black,
             fontSize = 14.sp,
-            textAlign = TextAlign.Center,
             modifier = Modifier.padding(8.dp)
         )
     }

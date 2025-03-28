@@ -24,6 +24,7 @@ cameraView = "1.4.1"
 cameraLifecycle = "1.4.1"
 appcompat = "1.7.0"
 material = "1.12.0"
+firebaseDatabaseKtx = "21.0.0"
 
 [libraries]
 android = { module = "io.github.webrtc-sdk:android", version.ref = "android" }
@@ -67,6 +68,7 @@ androidx-camera-view = { group = "androidx.camera", name = "camera-view", versio
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
