@@ -6,6 +6,8 @@ import org.webrtc.*
 
 class WebRTCManager(private val context: Context, var signalingClient: SignalingClient) {
     private val eglBase = EglBase.create()
+    val localView: SurfaceViewRenderer = SurfaceViewRenderer(context)
+    val remoteView: SurfaceViewRenderer = SurfaceViewRenderer(context)
     private var peerConnectionFactory: PeerConnectionFactory
     private var peerConnection: PeerConnection? = null
     private var localVideoTrack: VideoTrack? = null
@@ -126,6 +128,30 @@ class WebRTCManager(private val context: Context, var signalingClient: Signaling
 
     fun addIceCandidate(candidate: IceCandidate) {
         peerConnection?.addIceCandidate(candidate)
+    }
+
+    fun startCall() {
+        peerConnection = createPeerConnection()
+        createOffer()
+    }
+
+
+    init {
+        // Initialize SurfaceViewRenderers
+        localView.init(eglBase.eglBaseContext, null)
+        remoteView.init(eglBase.eglBaseContext, null)
+        localView.setMirror(true)
+        remoteView.setMirror(false)
+    }
+
+    fun toggleCamera() {
+        val videoTrack = localVideoTrack as VideoTrack
+        videoTrack.setEnabled(!videoTrack.enabled())
+    }
+
+    fun toggleMute() {
+        val audioTrack = localAudioTrack as AudioTrack
+        audioTrack.setEnabled(!audioTrack.enabled())
     }
 
 

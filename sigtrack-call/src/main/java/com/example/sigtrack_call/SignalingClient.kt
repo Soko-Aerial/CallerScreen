@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 class SignalingClient(
     private val serverUrl: String,
     private val webRTCManager: WebRTCManager,
-    private val onIncomingCall: (Any?) -> Unit, // Callback to trigger UI navigation
+    private val onIncomingCall: (String) -> Unit, // Callback to trigger UI navigation
     private val onCallDeclined: () -> Unit // Callback for handling declined calls
 ) {
     private val client = OkHttpClient.Builder()
@@ -37,8 +37,9 @@ class SignalingClient(
                 when (json.getString("type")) {
                     "offer" -> {
                         val sdp = json.getString("sdp")
+                        val callerId = json.optString("callerId", "Unknown Caller") // ✅ Extract caller ID
                         webRTCManager.acceptCall(sdp)
-                        onIncomingCall() // Trigger navigation to IncomingCallScreen
+                        onIncomingCall(callerId)
                     }
                     "answer" -> {
                         val sdp = json.getString("sdp")
@@ -58,6 +59,7 @@ class SignalingClient(
                     }
                 }
             }
+
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 Log.e("SignalingClient", "WebSocket error: ${t.message}")

@@ -37,6 +37,8 @@ import org.webrtc.SurfaceViewRenderer
 
 @Composable
 fun CallAnsweredScreen(navController: NavController, webRTCManager: WebRTCManager) {
+    RemoteVideoPreview(webRTCManager.remoteView, Modifier.fillMaxSize())
+    LocalVideoPreview(webRTCManager.localView, Modifier.fillMaxSize())
     val isLocalVideoSmall = remember { mutableStateOf(true) }
     val pipOffset = remember { mutableStateOf(Offset(50f, 100f)) }
     RequestPermissions()
